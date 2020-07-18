@@ -1,5 +1,6 @@
 Arduino compatible project to interface with the BMS slave 
-board on Tesla Model S modules.
+board on Tesla Model S modules and to control a Reva G-Wiz
+charger.
 
 The modules are daisy-chained together with a TTL interface.
 The interface uses a Molex 15-97-5101 connector and runs at
