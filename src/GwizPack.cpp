@@ -1,4 +1,5 @@
 #include "GwizPack.h"
+#include "MercBclassModule.h"
 
 GwizPack::GwizPack(BMSModule *modules)
 {
