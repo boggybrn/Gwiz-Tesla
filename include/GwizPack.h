@@ -8,6 +8,8 @@ public:
     GwizPack(BMSModule *modules);
     float getGwizPackVoltage();
     void printPackDetails();
+    float getHighestCellVoltage();
+    float getLowestCellVoltage();
 
 private:
     MercBclassModule chain1ModuleA;         // the pack is made up of two parallelled chains

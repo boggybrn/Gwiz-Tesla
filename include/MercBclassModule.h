@@ -9,6 +9,8 @@ public:
     void setModules(BMSModule *firstModule, BMSModule *secondModule);
     void printCellVotages();
     float getMercModuleVoltage();
+    float getLowestCellVoltage();
+    float getHighestCellVoltage();
 
 private:
     float MercBclassModuleVolt;                    // Both Tesla module voltages added together

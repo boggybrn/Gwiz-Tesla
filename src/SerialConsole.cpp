@@ -25,7 +25,7 @@
  */
 
 //#include <due_wire.h>
-//#include <Wire_EEPROM.h>
+#include <EEPROM.h>
 #include "SerialConsole.h"
 #include "Logger.h"
 #include "BMSModuleManager.h"
@@ -77,7 +77,7 @@ void SerialConsole::loop()
         if (whichDisplay == 1)
             bms.printPackDetails();
         if (whichDisplay == 2)
-            gwiz.printPackDetails();    
+            gwiz.printPackDetails();
     }
 }
 
@@ -297,7 +297,7 @@ void SerialConsole::handleConfigCmd()
     {
         if (newValue <= 0xFF)
         {
-            analogWrite(CHG_CURRENT_PORT, 0xFF - newValue);     //note that these signals are inverted, so flip in s/w
+            analogWrite(CHG_CURRENT_PORT, 0xFF - newValue); //note that these signals are inverted, so flip in s/w
             Logger::console("PWMC value set to  %d", newValue);
         }
         else
@@ -319,7 +319,7 @@ void SerialConsole::handleConfigCmd()
     }
     if (needEEPROMWrite)
     {
-        //  EEPROM.write(EEPROM_PAGE, settings);
+        EEPROM.put(EEPROM_PAGE, settings);
     }
 }
 
@@ -345,6 +345,16 @@ void SerialConsole::handleShortCmd()
     case 'C':
         Logger::console("Clearing all faults");
         bms.clearFaults();
+        break;
+    case 'E':
+        Logger::console("EEPROM version %d ", settings.version);
+        Logger::console("OverVSetpoint %f", settings.OverVSetpoint);
+        Logger::console("UnderVsetpoint %f ", settings.UnderVSetpoint);
+        Logger::console("OverTSetpoint %f ", settings.OverTSetpoint);
+        Logger::console("UnderTSetpoint %f ", settings.UnderTSetpoint);
+        Logger::console("balanceVoltage %f ", settings.balanceVoltage);
+        Logger::console("balanceHyst %f ", settings.balanceHyst);
+        Logger::console("logLevel %d ", settings.logLevel);
         break;
     case 'F':
         bms.findBoards();
@@ -410,5 +420,3 @@ void SerialConsole::handleShortCmd()
         break;
     }
 }
-
-

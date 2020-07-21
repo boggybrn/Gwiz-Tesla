@@ -1,8 +1,5 @@
-#if defined(__arm__) && defined(__SAM3X8E__)
-#include <chip.h>
-#endif
-
 #include <Arduino.h>
+#include <EEPROM.h>
 #include "Logger.h"
 #include "SerialConsole.h"
 #include "BMSModuleManager.h"
@@ -21,12 +18,13 @@ EEPROMSettings settings;
 SerialConsole console;
 uint32_t lastUpdate;
 
+#pragma GCC push_options
+#pragma GCC optimize ("O0") 
 void loadSettings()
 {
-    //EEPROM.read(EEPROM_PAGE, settings);
-
-    // if (settings.version != EEPROM_VERSION) //if settings are not the current version then erase them and set defaults
-    // {
+    EEPROM.get(EEPROM_PAGE, settings);  // for some reason the optimiser likes to omit this code!
+    if (settings.version != EEPROM_VERSION) //if settings are not the current version then erase them and set defaults
+    {
     Logger::console("Resetting to factory defaults");
     settings.version = EEPROM_VERSION;
     settings.checksum = 0;
@@ -37,15 +35,15 @@ void loadSettings()
     settings.balanceVoltage = 3.9f;
     settings.balanceHyst = 0.04f;
     settings.logLevel = 2;
-    //   EEPROM.write(EEPROM_PAGE, settings);
-    // }
-    // else {
-    //     Logger::console("Using stored values from EEPROM");
-    // }
+    EEPROM.put(EEPROM_PAGE, settings);
+    }
+    else {
+         Logger::console("Using stored values from EEPROM");
+     }
 
     Logger::setLoglevel((Logger::LogLevel)settings.logLevel);
 }
-
+#pragma GCC pop_options 
 void setup()
 {
 
@@ -54,8 +52,6 @@ void setup()
     SERIAL.begin(BMS_BAUD);
 
     SERIALCONSOLE.println("Started serial interface to BMS.");
-
-    //pinMode(13, INPUT);
 
     loadSettings();
 
@@ -84,7 +80,6 @@ void setup()
 
 void loop()
 {
-    // CAN_FRAME incoming;
     static bool ledState = false;
     static int chargerState = 0;
     

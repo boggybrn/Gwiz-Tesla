@@ -18,6 +18,48 @@ float MercBclassModule::getMercModuleVoltage()
     return moduleA->getModuleVoltage() + moduleB->getModuleVoltage();
 }
 
+float MercBclassModule::getLowestCellVoltage()
+{
+    float lowestVoltage = 5.0f;
+
+    for (int cellNum = 0; cellNum < cellsInModuleA; cellNum++)
+    {
+        if(lowestVoltage > moduleA->getCellVoltage(cellNum))
+        {
+            lowestVoltage = moduleA->getCellVoltage(cellNum);
+        }
+    }
+    for (int cellNum = 0; cellNum < cellsInModuleB; cellNum++)
+    {
+        if(lowestVoltage > moduleB->getCellVoltage(cellNum))
+        {
+            lowestVoltage = moduleB->getCellVoltage(cellNum);
+        }
+    }
+    return lowestVoltage;
+}
+
+float MercBclassModule::getHighestCellVoltage()
+{
+    float highestVoltage = 0;
+
+    for (int cellNum = 0; cellNum < cellsInModuleA; cellNum++)
+    {
+        if(highestVoltage < moduleA->getCellVoltage(cellNum))
+        {
+            highestVoltage = moduleA->getCellVoltage(cellNum);
+        }
+    }
+    for (int cellNum = 0; cellNum < cellsInModuleB; cellNum++)
+    {
+        if(highestVoltage < moduleB->getCellVoltage(cellNum))
+        {
+            highestVoltage = moduleB->getCellVoltage(cellNum);
+        }
+    }
+    return highestVoltage;
+}
+
 void MercBclassModule::printCellVotages()
 {
     for (int cellNum = 0; cellNum < cellsInModuleA; cellNum++)
@@ -33,7 +75,7 @@ void MercBclassModule::printCellVotages()
         SerialUSB.print("  Cell");
         SerialUSB.print(cellNum+cellsInModuleA);
         SerialUSB.print(": ");
-        SerialUSB.print(moduleA->getCellVoltage(cellNum), 3);
+        SerialUSB.print(moduleB->getCellVoltage(cellNum), 3);
         SerialUSB.print("V");
     }
 }
