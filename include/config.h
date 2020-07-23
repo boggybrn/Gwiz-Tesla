@@ -12,6 +12,7 @@
 
 //define the ports used to control the charger
 #define CRG_AC_AVAIL_PORT   PB15
+#define CHG_AC_AVAIL        0       // low signifies that AC is connected
 #define CHG_CURRENT_PORT    PB14
 #define CHG_VOLTAGE_PORT    PB13
 

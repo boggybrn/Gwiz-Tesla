@@ -1,3 +1,5 @@
+#ifndef UNIT_TEST
+
 #include <Arduino.h>
 #include <EEPROM.h>
 #include "Logger.h"
@@ -5,6 +7,7 @@
 #include "BMSModuleManager.h"
 #include "SystemIO.h"
 #include "GwizPack.h"
+#include "DeviceDrivers/IOPin.h"
 
 //#define BMS_BAUD  612500
 #define BMS_BAUD 617647
@@ -17,6 +20,7 @@ GwizPack gwiz(bms.modules);
 EEPROMSettings settings;
 SerialConsole console;
 uint32_t lastUpdate;
+IOPin acDetectionPin(CRG_AC_AVAIL_PORT);
 
 #pragma GCC push_options
 #pragma GCC optimize ("O0") 
@@ -92,7 +96,7 @@ void loop()
         bms.getAllVoltTemp();
         ledState = !ledState;
         digitalWrite(LED_BUILTIN, ledState); // toggle the LED
-        if (digitalRead(CRG_AC_AVAIL_PORT))
+        if (acDetectionPin.doDigitalRead())
         {
             if(chargerState != 1)
                 SERIALCONSOLE.println("Charger AC disconnected");
@@ -107,3 +111,5 @@ void loop()
         
     }
 }
+
+#endif      //UNIT_TEST
