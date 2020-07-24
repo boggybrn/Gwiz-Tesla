@@ -1,8 +1,9 @@
 #pragma once
 #include "config.h"
 #include "MercBclassModule.h"
+#include <GwizPackInterface.h>
 
-class GwizPack
+class GwizPack : public GwizPackInterface
 {
 public:
     GwizPack(BMSModule *modules);

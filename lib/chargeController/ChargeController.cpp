@@ -1,10 +1,14 @@
 #include <ChargeController.h>
+#include <EEPROMSettings.h>
 
 
-ChargeController::ChargeController(PinInterface *pin)
+extern EEPROMSettings settings;
+
+ChargeController::ChargeController(PinInterface *pin, GwizPackInterface *pack)
 {
     state = IDLE;
     acConnectedPin = pin;
+    myPack = pack;
 }
 
 void ChargeController::init(void)
@@ -16,7 +20,15 @@ void ChargeController::service(void)
 {
     if(!acConnectedPin->doDigitalRead())
     {
-        state = AC_CONNECTED;
+        if(myPack->getHighestCellVoltage() >= settings.OverVSetpoint)
+        {
+            state = CHARGE_COMPLETE;
+        }
+        else
+        {
+            state = CHARGING;
+        }
+        
     }
     else
     {

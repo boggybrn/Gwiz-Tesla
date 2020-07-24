@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
+#include "EEPROMSettings.h"
 
 //Set to the proper port for your USB connection - SerialUSB on Due (Native) or Serial for Due (Programming) or Teensy
 #define SERIALCONSOLE   Serial
@@ -55,14 +56,4 @@
 #define DOUT1_H             8
 #define DOUT1_L             9
 
-typedef struct {
-    uint8_t version;
-    uint8_t checksum;
-    uint8_t logLevel;
-    float OverVSetpoint;
-    float UnderVSetpoint;
-    float OverTSetpoint;
-    float UnderTSetpoint;
-    float balanceVoltage;
-    float balanceHyst;
-} EEPROMSettings;
+
