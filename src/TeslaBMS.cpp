@@ -8,6 +8,7 @@
 #include "SystemIO.h"
 #include "GwizPack.h"
 #include "DeviceDrivers/IOPin.h"
+#include <ChargeController.h>
 
 //#define BMS_BAUD  612500
 #define BMS_BAUD 617647
@@ -21,6 +22,10 @@ EEPROMSettings settings;
 SerialConsole console;
 uint32_t lastUpdate;
 IOPin acDetectionPin(CRG_AC_AVAIL_PORT);
+IOPin chgCurrentPin(CHG_CURRENT_PORT);
+IOPin chgVoltagePin(CHG_VOLTAGE_PORT);
+
+ChargeController chargeController(&acDetectionPin, &chgCurrentPin, &chgVoltagePin, &gwiz);
 
 #pragma GCC push_options
 #pragma GCC optimize ("O0") 

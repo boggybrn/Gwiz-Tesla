@@ -7,6 +7,11 @@ void MockIOPin::setPinValue(uint32_t val)
     pinValue = val;
 }
 
+uint32_t MockIOPin::getPinValue(void)
+{
+    return pinValue;
+}
+
 void MockIOPin::doDigitalWrite(uint32_t val)
 {
     pinValue = val;
@@ -19,7 +24,7 @@ int MockIOPin::doDigitalRead(void)
 
 void MockIOPin::doAnalogWrite(uint32_t value)
 {
-    pinValue = pinValue;
+    pinValue = value;
 }
 
 #endif

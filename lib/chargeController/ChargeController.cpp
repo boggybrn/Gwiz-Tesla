@@ -3,10 +3,13 @@
 
 extern EEPROMSettings settings;
 
-ChargeController::ChargeController(PinInterface *pin, GwizPackInterface *pack)
+ChargeController::ChargeController(PinInterface *acPin, PinInterface *ccPin, PinInterface *vcPin, GwizPackInterface *pack)
 {
     state = IDLE;
-    acConnectedPin = pin;
+    acConnectedPin = acPin;
+    currentControlPin = ccPin;
+    voltageControlPin = vcPin;
+
     myPack = pack;
 }
 
@@ -16,9 +19,9 @@ void ChargeController::init(void)
 
 void ChargeController::service(void)
 {
-    if (acConnectedPin->doDigitalRead())        //anytime the AC cable is disconnected jump back to the idle state
+    if (acConnectedPin->doDigitalRead()) //anytime the AC cable is disconnected jump back to the idle state
     {
-        state = IDLE;
+        stopCharging();
     }
 
     switch (state)
@@ -26,26 +29,72 @@ void ChargeController::service(void)
     case IDLE: // in this state we are waiting for the AC charging cable to be plugged in
         if (!acConnectedPin->doDigitalRead())
         {
-            state = CHARGING;
+            if (myPack->getLowestTemperature() <= settings.UnderTSetpoint)
+            {
+                state = TOO_COLD_TO_CHARGE;
+            }
+            else
+            {
+                if (myPack->getHighestTemperature() >= settings.OverTSetpoint)
+                {
+                    state = TOO_HOT_TO_CHARGE;
+                }
+                else
+                {
+                    startCharging();
+                }
+            }
         }
         break;
 
     case CHARGING:
         if (myPack->getHighestCellVoltage() >= settings.OverVSetpoint)
         {
+            stopCharging();
             state = CHARGE_COMPLETE;
         }
         if (myPack->getLowestTemperature() <= settings.UnderTSetpoint)
         {
+            stopCharging();
             state = TOO_COLD_TO_CHARGE;
         }
         break;
 
     case TOO_COLD_TO_CHARGE:
-        if (myPack->getLowestTemperature() > settings.UnderTSetpoint)       // battery pack has warmed up enough for charging to commence
+        if (myPack->getLowestTemperature() > settings.UnderTSetpoint) // battery pack has warmed up enough for charging to commence
         {
-            state = CHARGING;
+            startCharging();
+        }
+        break;
+
+    case TOO_HOT_TO_CHARGE:
+        if (myPack->getHighestTemperature() < settings.OverTSetpoint)
+        {
+            startCharging();
         }
         break;
     }
+}
+
+/*
+    Below here are private functions
+    ================================
+*/
+
+void ChargeController::startCharging(void)
+{
+    state = CHARGING;
+    chargingCurrent = max_charging_current;
+    chargingVoltage = max_charging_voltage;
+    currentControlPin->doAnalogWrite(chargingCurrent);
+    voltageControlPin->doAnalogWrite(chargingVoltage);
+}
+
+void ChargeController::stopCharging(void)
+{
+    state = IDLE;
+    chargingCurrent = min_charging_current;
+    chargingVoltage = min_charging_voltage;
+    currentControlPin->doAnalogWrite(chargingCurrent);
+    voltageControlPin->doAnalogWrite(chargingVoltage);
 }
