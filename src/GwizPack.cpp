@@ -19,6 +19,13 @@ GwizPack::GwizPack(BMSModule *modules)
     chain1ModuleB.setModules(&modules[3], &modules[4]);
     chain2ModuleA.setModules(&modules[5], &modules[6]);
     chain2ModuleB.setModules(&modules[7], &modules[8]);
+
+    // set up an array of pointers to these modules, for easy iteration through them
+    myModules[0] = &chain1ModuleA;
+    myModules[1] = &chain1ModuleB;
+    myModules[2] = &chain2ModuleA;
+    myModules[3] = &chain2ModuleB;
+
 }
 
 float GwizPack::getGwizPackVoltage()
@@ -26,40 +33,58 @@ float GwizPack::getGwizPackVoltage()
     return chain1ModuleA.getMercModuleVoltage();    // since the chains are wired in parallel the voltage shoud be the same on both...
 }
 
+float GwizPack::getLowestTemperature()
+{
+    float lowestTemperature = 100;
+
+    for(int i = 0 ; i < MODULES_IN_PACK ; i++)
+    {
+        if(myModules[i]->getLowestTemperature() < lowestTemperature)
+        {
+            lowestTemperature = myModules[i]->getLowestTemperature();
+        }
+    }
+    return lowestTemperature;
+}
+
+float GwizPack::getHighestTemperature()
+{
+    float highestTemperature = -50;
+
+    for(int i = 0 ; i < MODULES_IN_PACK ; i++)
+    {
+        if(myModules[i]->getHighestTemperature() > highestTemperature)
+        {
+            highestTemperature = myModules[i]->getHighestTemperature();
+        }
+    }
+    return highestTemperature;
+}
+
 float GwizPack::getHighestCellVoltage()
 {
-    float highestCellVoltage = chain1ModuleA.getHighestCellVoltage();
+    float highestCellVoltage = 0;
 
-    if(highestCellVoltage < chain1ModuleB.getHighestCellVoltage())
+    for(int i = 0 ; i < MODULES_IN_PACK ; i++)
     {
-        highestCellVoltage = chain1ModuleB.getHighestCellVoltage();
-    }
-    if(highestCellVoltage < chain2ModuleA.getHighestCellVoltage())
-    {
-        highestCellVoltage = chain2ModuleA.getHighestCellVoltage();
-    }
-    if(highestCellVoltage < chain2ModuleB.getHighestCellVoltage())
-    {
-        highestCellVoltage = chain2ModuleB.getHighestCellVoltage();
+        if(myModules[i]->getHighestCellVoltage() > highestCellVoltage)
+        {
+            highestCellVoltage = myModules[i]->getHighestCellVoltage();
+        }
     }
     return highestCellVoltage;
 }
 
 float GwizPack::getLowestCellVoltage()
 {
-    float lowestCellVoltage = chain1ModuleA.getLowestCellVoltage();
-
-    if(lowestCellVoltage > chain1ModuleB.getLowestCellVoltage())
+    float lowestCellVoltage = 5;
+    
+    for(int i = 0 ; i < MODULES_IN_PACK ; i++)
     {
-        lowestCellVoltage = chain1ModuleB.getLowestCellVoltage();
-    }
-    if(lowestCellVoltage > chain2ModuleA.getLowestCellVoltage())
-    {
-        lowestCellVoltage = chain2ModuleA.getLowestCellVoltage();
-    }
-    if(lowestCellVoltage > chain2ModuleB.getLowestCellVoltage())
-    {
-        lowestCellVoltage = chain2ModuleB.getLowestCellVoltage();
+        if(myModules[i]->getLowestCellVoltage() < lowestCellVoltage)
+        {
+            lowestCellVoltage = myModules[i]->getLowestCellVoltage();
+        }
     }
     return lowestCellVoltage;
 }
@@ -93,6 +118,12 @@ void GwizPack::printPackDetails()
 
     SerialUSB.print("\n\rLowest cell voltage ");
     SerialUSB.print(getLowestCellVoltage(), 3);
+
+    SerialUSB.print("\n\rHighest temperature ");
+    SerialUSB.print(getHighestTemperature(), 2);
+
+    SerialUSB.print("\n\rLowest temperature ");
+    SerialUSB.print(getLowestTemperature(), 2);
 
     SerialUSB.print("\n\r");
 }

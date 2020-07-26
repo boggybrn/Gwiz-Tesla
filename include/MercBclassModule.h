@@ -11,6 +11,8 @@ public:
     float getMercModuleVoltage();
     float getLowestCellVoltage();
     float getHighestCellVoltage();
+    float getLowestTemperature();
+    float getHighestTemperature();
 
 private:
     float MercBclassModuleVolt;                    // Both Tesla module voltages added together

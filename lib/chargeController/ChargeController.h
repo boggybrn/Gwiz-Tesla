@@ -7,7 +7,8 @@ typedef enum ChargerState
 {
     IDLE,
     CHARGING,
-    CHARGE_COMPLETE
+    CHARGE_COMPLETE,
+    TOO_COLD_TO_CHARGE
 } ChargerState;
 
 class ChargeController
