@@ -29,7 +29,7 @@ public:
     int getAddress();
     bool isExisting();
     void setExists(bool ex);
-    void balanceCells();
+    void stopBalance();
     uint8_t getBalancingState(int cell);
 
 private:

@@ -95,6 +95,7 @@ void SerialConsole::printMenu()
     Logger::console("   F = Find all connected boards");
     Logger::console("   R = Renumber connected boards in sequence");
     Logger::console("   B = Attempt balancing for 5 seconds");
+    Logger::console("   b = stop balancing");
     Logger::console("   p = Toggle output of pack summary every 3 seconds");
     Logger::console("   d = Toggle output of pack details every 3 seconds");
     Logger::console("   g = Toggle output of G-Wiz details every 3 seconds");
@@ -364,8 +365,11 @@ void SerialConsole::handleShortCmd()
         bms.renumberBoardIDs();
         break;
     case 'B':
-        bms.balanceCells();
+        bms.balanceCells(gwiz.getLowestCellVoltage(), 50, 1);
         break;
+    case 'b':
+        bms.stopBalancing();
+        break;    
     case 'p':
         if (whichDisplay == 1 && printPrettyDisplay)
             whichDisplay = 0;

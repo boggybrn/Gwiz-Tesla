@@ -39,9 +39,9 @@ float GwizPack::getLowestTemperature()
 
     for(int i = 0 ; i < MODULES_IN_PACK ; i++)
     {
-        if(myModules[i]->getLowestTemperature() < lowestTemperature)
+        if(myModules[i]->getLowestTemperatureNow() < lowestTemperature)
         {
-            lowestTemperature = myModules[i]->getLowestTemperature();
+            lowestTemperature = myModules[i]->getLowestTemperatureNow();
         }
     }
     return lowestTemperature;
@@ -53,9 +53,9 @@ float GwizPack::getHighestTemperature()
 
     for(int i = 0 ; i < MODULES_IN_PACK ; i++)
     {
-        if(myModules[i]->getHighestTemperature() > highestTemperature)
+        if(myModules[i]->getHighestTemperatureNow() > highestTemperature)
         {
-            highestTemperature = myModules[i]->getHighestTemperature();
+            highestTemperature = myModules[i]->getHighestTemperatureNow();
         }
     }
     return highestTemperature;

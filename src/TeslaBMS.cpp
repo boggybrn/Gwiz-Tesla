@@ -85,6 +85,8 @@ void setup()
 
     analogWrite(CHG_VOLTAGE_PORT, 255); // set the minimum voltage to ensure that the charger is off
     analogWrite(CHG_CURRENT_PORT, 225); // and set to the minimum current by default
+
+    chargeController.init();
 }
 
 void loop()
@@ -101,17 +103,22 @@ void loop()
         bms.getAllVoltTemp();
         ledState = !ledState;
         digitalWrite(LED_BUILTIN, ledState); // toggle the LED
-        if (acDetectionPin.doDigitalRead())
+        
+        chargeController.service();
+
+        if(chargeController.state != chargerState)
         {
-            if(chargerState != 1)
-                SERIALCONSOLE.println("Charger AC disconnected");
-            chargerState = 1;    
-        }
-        else
-        {
-            if(chargerState != 2)
-                SERIALCONSOLE.println("Charger AC connected");
-            chargerState = 2;    
+            chargerState = chargeController.state;
+            switch (chargerState)
+            {
+                case CHARGING:
+                    SERIALCONSOLE.println("Charging Started");
+                break;
+
+                default:
+                    SERIALCONSOLE.println("Charging stopped");
+
+            }
         }
         
     }

@@ -16,14 +16,99 @@ BMSModuleManager::BMSModuleManager()
     isFaulted = false;
 }
 
-void BMSModuleManager::balanceCells()
+/*void BMSModuleManager::balanceCells()
 {
-    /* Do nothing for now - need to get better balancing from SimpBMS
+    
     for (int address = 1; address <= MAX_MODULE_ADDR; address++)
     {
         if (modules[address].isExisting())
             modules[address].balanceCells();
-    }*/
+    }
+} */
+
+/* this function taken from https://github.com/tomdebree/TeslaBMSV2 but modified so that
+    it is passed the minimum cell voltage
+*/
+
+void BMSModuleManager::balanceCells(float lowestCellVoltage, int duration, int debug)
+{
+  uint8_t payload[4];
+  uint8_t buff[30];
+  uint8_t balance = 0;//bit 0 - 5 are to activate cell balancing 1-6
+  //CellsBalancing = 0;
+  if (debug == 1)
+  {
+    Serial.println();
+  }
+  for (int y = 1; y < 63; y++)
+  {
+    if (modules[y].isExisting() == 1)
+    {
+      balance = 0;
+      for (int i = 0; i < 6; i++)
+      {
+        if (lowestCellVoltage < modules[y].getCellVoltage(i))
+        {
+          balance = balance | (1 << i);
+        }
+      }
+      if (debug == 1)
+      {
+        Serial.print(y);
+        Serial.print(" - ");
+        Serial.print(balance, BIN);
+        Serial.print(" | ");
+      }
+      if (balance != 0) //only send balance command when needed
+      {
+        payload[0] = y << 1;
+        payload[1] = REG_BAL_TIME;
+        payload[2] = duration;      // limits the duration of the balancing until it is retriggered 
+        BMSUtil::sendData(payload, 3, true);
+        delay(2);
+        BMSUtil::getReply(buff, 30);
+        if (debug == 1)
+        {
+          for (int z = 0; z < 4; z++)
+          {
+            Serial.print(buff[z], HEX);
+            Serial.print("-");
+          }
+          Serial.print(" | ");
+        }
+        payload[0] = y << 1;
+        payload[1] = REG_BAL_CTRL;
+        payload[2] = balance; //write balance state to register
+        BMSUtil::sendData(payload, 3, true);
+        delay(2);
+        BMSUtil::getReply(buff, 30);
+        if (debug == 1)
+        {
+          for (int z = 0; z < 4; z++)
+          {
+            Serial.print(buff[z], HEX);
+            Serial.print("-");
+          }
+        }
+        //CellsBalancing = CellsBalancing + balance;
+      }
+      if (debug == 1)
+      {
+        Serial.println();
+      }
+    }
+  }
+}
+
+void BMSModuleManager::stopBalancing()
+{
+  for (int x = 1; x <= MAX_MODULE_ADDR; x++)
+  {
+    if (modules[x].isExisting())
+    {
+      modules[x].stopBalance();
+    }
+  }
 }
 
 /*

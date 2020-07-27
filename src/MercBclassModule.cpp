@@ -60,22 +60,34 @@ float MercBclassModule::getHighestCellVoltage()
     return highestVoltage;
 }
 
-float MercBclassModule::getLowestTemperature()
+float MercBclassModule::getLowestTemperatureNow()
 {
-    float lowestTemp = moduleA->getLowestTemp();
+    float lowestTemp = moduleA->getTemperature(0);
 
-    if(lowestTemp > moduleB->getLowestTemp())
-        lowestTemp =  moduleB->getLowestTemp();
+    if(lowestTemp > moduleA->getTemperature(1))     //two temperature sensors per module - but it isn't clear if the second one does anything!
+        lowestTemp =  moduleA->getTemperature(1);
+
+    if(lowestTemp > moduleB->getTemperature(0))
+        lowestTemp =  moduleB->getTemperature(0);
+
+    if(lowestTemp > moduleB->getTemperature(1))
+        lowestTemp =  moduleB->getTemperature(1);
 
     return lowestTemp;    
 }
 
-float MercBclassModule::getHighestTemperature()
+float MercBclassModule::getHighestTemperatureNow()
 {
-    float highestTemp = moduleA->getHighestTemp();
+    float highestTemp = moduleA->getTemperature(0);
 
-    if(highestTemp > moduleB->getHighestTemp())
-        highestTemp =  moduleB->getHighestTemp();
+    if(highestTemp > moduleA->getTemperature(1))
+        highestTemp =  moduleA->getTemperature(1);
+
+    if(highestTemp > moduleB->getTemperature(0))
+        highestTemp =  moduleB->getTemperature(0);
+
+    if(highestTemp > moduleB->getTemperature(1))
+        highestTemp =  moduleB->getTemperature(1);    
 
     return highestTemp; 
 }

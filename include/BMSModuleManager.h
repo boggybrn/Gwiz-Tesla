@@ -7,7 +7,9 @@ class BMSModuleManager
 {
 public:
     BMSModuleManager();
-    void balanceCells();
+    //void balanceCells();
+    void balanceCells(float lowestCellVoltage, int duration, int debug);
+    void stopBalancing();
     void setupBoards();
     void findBoards();
     void renumberBoardIDs();
