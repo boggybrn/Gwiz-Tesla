@@ -10,4 +10,5 @@ typedef struct {
     float UnderTSetpoint;
     float balanceVoltage;
     float balanceHyst;
+    float balanceTollerance;
 } EEPROMSettings;

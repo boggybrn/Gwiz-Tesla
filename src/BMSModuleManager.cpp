@@ -12,7 +12,7 @@ BMSModuleManager::BMSModuleManager()
         modules[i].setExists(false);
         modules[i].setAddress(i);
     }
-    
+
     isFaulted = false;
 }
 
@@ -32,83 +32,90 @@ BMSModuleManager::BMSModuleManager()
 
 void BMSModuleManager::balanceCells(float lowestCellVoltage, int duration, int debug)
 {
-  uint8_t payload[4];
-  uint8_t buff[30];
-  uint8_t balance = 0;//bit 0 - 5 are to activate cell balancing 1-6
-  //CellsBalancing = 0;
-  if (debug == 1)
-  {
-    Serial.println();
-  }
-  for (int y = 1; y < 63; y++)
-  {
-    if (modules[y].isExisting() == 1)
+    uint8_t payload[4];
+    uint8_t buff[30];
+    uint8_t balance = 0; //bit 0 - 5 are to activate cell balancing 1-6
+    //CellsBalancing = 0;
+    if (debug == 1)
     {
-      balance = 0;
-      for (int i = 0; i < 6; i++)
-      {
-        if (lowestCellVoltage < modules[y].getCellVoltage(i))
-        {
-          balance = balance | (1 << i);
-        }
-      }
-      if (debug == 1)
-      {
-        Serial.print(y);
-        Serial.print(" - ");
-        Serial.print(balance, BIN);
-        Serial.print(" | ");
-      }
-      if (balance != 0) //only send balance command when needed
-      {
-        payload[0] = y << 1;
-        payload[1] = REG_BAL_TIME;
-        payload[2] = duration;      // limits the duration of the balancing until it is retriggered 
-        BMSUtil::sendData(payload, 3, true);
-        delay(2);
-        BMSUtil::getReply(buff, 30);
-        if (debug == 1)
-        {
-          for (int z = 0; z < 4; z++)
-          {
-            Serial.print(buff[z], HEX);
-            Serial.print("-");
-          }
-          Serial.print(" | ");
-        }
-        payload[0] = y << 1;
-        payload[1] = REG_BAL_CTRL;
-        payload[2] = balance; //write balance state to register
-        BMSUtil::sendData(payload, 3, true);
-        delay(2);
-        BMSUtil::getReply(buff, 30);
-        if (debug == 1)
-        {
-          for (int z = 0; z < 4; z++)
-          {
-            Serial.print(buff[z], HEX);
-            Serial.print("-");
-          }
-        }
-        //CellsBalancing = CellsBalancing + balance;
-      }
-      if (debug == 1)
-      {
         Serial.println();
-      }
+        Serial.print("Lowest voltage - ");
+        Serial.print(lowestCellVoltage);
+        Serial.println();
     }
-  }
+    for (int y = 1; y < 63; y++)
+    {
+        if (modules[y].isExisting() == 1)
+        {
+            balance = 0;
+            for (int i = 0; i < 6; i++)
+            {
+                Serial.print("cell voltage - ");
+                Serial.print(modules[y].getCellVoltage(i));
+                Serial.println();
+
+                if ((lowestCellVoltage + settings.balanceTollerance) < modules[y].getCellVoltage(i))
+                {
+                    balance = balance | (1 << i);
+                }
+            }
+            if (debug == 1)
+            {
+                Serial.print(y);
+                Serial.print(" - ");
+                Serial.print(balance, BIN);
+                Serial.print(" | ");
+            }
+            if (balance != 0) //only send balance command when needed
+            {
+                payload[0] = y << 1;
+                payload[1] = REG_BAL_TIME;
+                payload[2] = duration; // limits the duration of the balancing until it is retriggered
+                BMSUtil::sendData(payload, 3, true);
+                delay(2);
+                BMSUtil::getReply(buff, 30);
+                if (debug == 1)
+                {
+                    for (int z = 0; z < 4; z++)
+                    {
+                        Serial.print(buff[z], HEX);
+                        Serial.print("-");
+                    }
+                    Serial.print(" | ");
+                }
+                payload[0] = y << 1;
+                payload[1] = REG_BAL_CTRL;
+                payload[2] = balance; //write balance state to register
+                BMSUtil::sendData(payload, 3, true);
+                delay(2);
+                BMSUtil::getReply(buff, 30);
+                if (debug == 1)
+                {
+                    for (int z = 0; z < 4; z++)
+                    {
+                        Serial.print(buff[z], HEX);
+                        Serial.print("-");
+                    }
+                }
+                //CellsBalancing = CellsBalancing + balance;
+            }
+            if (debug == 1)
+            {
+                Serial.println();
+            }
+        }
+    }
 }
 
 void BMSModuleManager::stopBalancing()
 {
-  for (int x = 1; x <= MAX_MODULE_ADDR; x++)
-  {
-    if (modules[x].isExisting())
+    for (int x = 1; x <= MAX_MODULE_ADDR; x++)
     {
-      modules[x].stopBalance();
+        if (modules[x].isExisting())
+        {
+            modules[x].stopBalance();
+        }
     }
-  }
 }
 
 /*
@@ -555,76 +562,3 @@ void BMSModuleManager::printPackDetails()
         }
     }
 }
-
-void BMSModuleManager::printGWizDetails()
-{
-    uint8_t faults;
-    uint8_t alerts;
-    uint8_t COV;
-    uint8_t CUV;
-    int cellNum = 0;
-    int cellsPerModule;
-
-    Logger::console("");
-    Logger::console("");
-    Logger::console("");
-    Logger::console("                                         Pack Status:");
-    if (isFaulted)
-        Logger::console("                                           FAULTED!");
-    else
-        Logger::console("                                      All systems go!");
-
-    Logger::console("");
-    for (int y = 1; y < 8; y++)
-    {
-        if (modules[y].isExisting())
-        {
-            faults = modules[y].getFaults();
-            alerts = modules[y].getAlerts();
-            COV = modules[y].getCOVCells();
-            CUV = modules[y].getCUVCells();
-
-            if (y % 2)
-            {
-                SerialUSB.print("Module #");
-                SerialUSB.print(y);
-            }
-            if (y < 10)
-                SerialUSB.print(" ");
-            SerialUSB.print("  ");
-            SerialUSB.print(modules[y].getModuleVoltage());
-            SerialUSB.print("V");
-
-            if (y % 2)
-            {
-                cellsPerModule = 4;
-            }
-            else
-            {
-                cellsPerModule = 3;
-            }
-
-            for (int i = 0; i < cellsPerModule; i++)
-            {
-                if (cellNum < 10)
-                    SerialUSB.print(" ");
-                SerialUSB.print("  Cell");
-                SerialUSB.print(cellNum++);
-                SerialUSB.print(": ");
-                SerialUSB.print(modules[y].getCellVoltage(i));
-                SerialUSB.print("V");
-                if (modules[y].getBalancingState(i) == 1)
-                    SerialUSB.print("*");
-                else
-                    SerialUSB.print(" ");
-            }
-            //SerialUSB.print("  Neg Term Temp: ");
-            //SerialUSB.print(modules[y].getTemperature(0));
-            //SerialUSB.print("C  Pos Term Temp: ");
-            //SerialUSB.print(modules[y].getTemperature(1));
-            //SerialUSB.println("C");
-        }
-    }
-}
-
-

@@ -80,13 +80,13 @@ float MercBclassModule::getHighestTemperatureNow()
 {
     float highestTemp = moduleA->getTemperature(0);
 
-    if(highestTemp > moduleA->getTemperature(1))
+    if(highestTemp < moduleA->getTemperature(1))
         highestTemp =  moduleA->getTemperature(1);
 
-    if(highestTemp > moduleB->getTemperature(0))
+    if(highestTemp < moduleB->getTemperature(0))
         highestTemp =  moduleB->getTemperature(0);
 
-    if(highestTemp > moduleB->getTemperature(1))
+    if(highestTemp < moduleB->getTemperature(1))
         highestTemp =  moduleB->getTemperature(1);    
 
     return highestTemp; 

@@ -40,9 +40,10 @@ void loadSettings()
     settings.OverVSetpoint = 4.1f;
     settings.UnderVSetpoint = 3.1f;
     settings.OverTSetpoint = 65.0f;
-    settings.UnderTSetpoint = -10.0f;
+    settings.UnderTSetpoint = 1.0f;
     settings.balanceVoltage = 3.9f;
     settings.balanceHyst = 0.04f;
+    settings.balanceTollerance = 0.005f;
     settings.logLevel = 2;
     EEPROM.put(EEPROM_PAGE, settings);
     }

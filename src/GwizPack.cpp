@@ -97,33 +97,36 @@ void GwizPack::printPackDetails()
     SerialUSB.print("  Chain 2 voltage ");
     SerialUSB.print(chain2ModuleA.getMercModuleVoltage() + chain2ModuleB.getMercModuleVoltage(), 3);
 
-    SerialUSB.print("\n\rChain1 Module A voltage ");
+    SerialUSB.print("\nChain1 Module A voltage ");
     SerialUSB.print(chain1ModuleA.getMercModuleVoltage(), 3);
     chain1ModuleA.printCellVotages();
 
-    SerialUSB.print("\n\rChain1 Module B voltage ");
+    SerialUSB.print("\nChain1 Module B voltage ");
     SerialUSB.print(chain1ModuleB.getMercModuleVoltage(), 3);
     chain1ModuleB.printCellVotages();
 
-    SerialUSB.print("\n\rChain2 Module A voltage ");
+    SerialUSB.print("\nChain2 Module A voltage ");
     SerialUSB.print(chain2ModuleA.getMercModuleVoltage(), 3);
     chain2ModuleA.printCellVotages();
 
-    SerialUSB.print("\n\rChain2 Module B voltage ");
+    SerialUSB.print("\nChain2 Module B voltage ");
     SerialUSB.print(chain2ModuleA.getMercModuleVoltage(), 3);
     chain2ModuleB.printCellVotages();
 
-    SerialUSB.print("\n\rHighest cell voltage ");
+    SerialUSB.print("\nHighest cell voltage ");
     SerialUSB.print(getHighestCellVoltage(), 3);
 
-    SerialUSB.print("\n\rLowest cell voltage ");
+    SerialUSB.print("  Lowest cell voltage ");
     SerialUSB.print(getLowestCellVoltage(), 3);
 
-    SerialUSB.print("\n\rHighest temperature ");
+    SerialUSB.print("  Cell voltage difference ");
+    SerialUSB.print(getHighestCellVoltage() - getLowestCellVoltage(), 3);
+
+    SerialUSB.print("\nHighest temperature ");
     SerialUSB.print(getHighestTemperature(), 2);
 
-    SerialUSB.print("\n\rLowest temperature ");
+    SerialUSB.print("  Lowest temperature ");
     SerialUSB.print(getLowestTemperature(), 2);
 
-    SerialUSB.print("\n\r");
+    SerialUSB.print("\n");
 }

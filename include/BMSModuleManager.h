@@ -24,7 +24,6 @@ public:
     float getAvgCellVolt();
     void printPackSummary();
     void printPackDetails();
-    void printGWizDetails();
     BMSModule modules[MAX_MODULE_ADDR + 1]; // store data for as many modules as we've configured for.
 
 private:

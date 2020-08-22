@@ -109,6 +109,7 @@ void SerialConsole::printMenu()
     Logger::console("   TEMPLIMLO=%f - Low limit for cell temperature in degrees C", settings.UnderTSetpoint);
     Logger::console("   BALVOLT=%f - Voltage at which to begin cell balancing", settings.balanceVoltage);
     Logger::console("   BALHYST=%f - How far voltage must dip before balancing is turned off", settings.balanceHyst);
+    Logger::console("   BALTOL=%f - Tollerance from lowest cell to trigger balancing in another cell", settings.balanceTollerance);
 
     float OverVSetpoint;
     float UnderVSetpoint;
@@ -272,6 +273,18 @@ void SerialConsole::handleConfigCmd()
         else
             Logger::console("Invalid balance hysteresis. Please enter a value 0.0 to 1.0");
     }
+    else if (cmdString == String("BALTOL"))
+    {
+        if (newFloat >= 0.0f && newFloat <= 1.0f)
+        {
+            settings.balanceTollerance = newFloat;
+            needEEPROMWrite = true;
+            Logger::console("Balance tollerance set to %f", settings.balanceTollerance);
+        }
+        else
+            Logger::console("Invalid balance tollerance. Please enter a value 0.0 to 1.0");
+    }
+    
     else if (cmdString == String("TEMPLIMHI"))
     {
         if (newFloat >= 0.0f && newFloat <= 100.0f)
