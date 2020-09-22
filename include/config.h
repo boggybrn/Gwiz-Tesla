@@ -11,6 +11,10 @@
 //On the Due you need to use a USART port (Serial1, Serial2, Serial3) and update the call to serialSpecialInit if not Serial1
 #define SERIAL  Serial3
 
+//Define this to be the serial port to the WiFi module that runs the web interface
+#define SERIALWIFI  Serial2
+#define SERIALWIFI_BAUD 115200
+
 //define the ports used to control the charger
 #define CRG_AC_AVAIL_PORT   PB15
 #define CHG_AC_AVAIL        0       // low signifies that AC is connected

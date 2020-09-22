@@ -30,7 +30,7 @@ GwizPack::GwizPack(BMSModule *modules)
 
 float GwizPack::getGwizPackVoltage()
 {
-    return chain1ModuleA.getMercModuleVoltage();    // since the chains are wired in parallel the voltage shoud be the same on both...
+    return chain1ModuleA.getMercModuleVoltage() + chain1ModuleB.getMercModuleVoltage();    // since the chains are wired in parallel the voltage shoud be the same on both...
 }
 
 float GwizPack::getLowestTemperature()

@@ -9,12 +9,14 @@
 #include "GwizPack.h"
 #include "DeviceDrivers/IOPin.h"
 #include <ChargeController.h>
+#include <WiFiWebGUI.h>
 
 //#define BMS_BAUD  612500
 #define BMS_BAUD 617647
 //#define BMS_BAUD  608695
 
 HardwareSerial Serial3(PB11, PB10);
+HardwareSerial Serial2(PA3, PA2);
 
 BMSModuleManager bms;
 GwizPack gwiz(bms.modules);
@@ -26,6 +28,7 @@ IOPin chgCurrentPin(CHG_CURRENT_PORT);
 IOPin chgVoltagePin(CHG_VOLTAGE_PORT);
 
 ChargeController chargeController(&acDetectionPin, &chgCurrentPin, &chgVoltagePin, &gwiz);
+WiFiWebGUI webGUI(&gwiz);
 
 #pragma GCC push_options
 #pragma GCC optimize ("O0") 
@@ -88,6 +91,7 @@ void setup()
     analogWrite(CHG_CURRENT_PORT, 225); // and set to the minimum current by default
 
     chargeController.init();
+    webGUI.init();
 }
 
 void loop()
@@ -96,6 +100,7 @@ void loop()
     static int chargerState = 0;
     
     console.loop();
+    webGUI.service();
 
     if (millis() > (lastUpdate + 1000))
     {
