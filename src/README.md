@@ -1,14 +1,11 @@
 Arduino compatible project to interface with the BMS slave 
 board on Tesla Model S modules and to control a Reva G-Wiz
-charger. Note that this is entended to run on an STM32 
-Blue Pill board with appropriate 
+charger. Note that this is intended to run on an STM32 
+Blue Pill board with appropriate surrounding hardware.
 
 The modules are daisy-chained together with a TTL interface.
 The interface uses a Molex 15-97-5101 connector and runs at
-612500 baud. This can be a difficult baud rate to match with
-arduino compatible processors. The Arduino Due and Teensy
-3.5/3.6 boards are confirmed to be able to generate a suitably
-close baud rate. The factory wiring to each module is comprised
+612500 baud. The factory wiring to each module is comprised
 of two sets of 5 differently colored wires:
 
 * Red = 5V input to the module
