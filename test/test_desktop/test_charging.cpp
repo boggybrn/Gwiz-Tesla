@@ -74,6 +74,29 @@ void whenCellHighVoltageLimitReachedStopCharge()
     TEST_ASSERT_EQUAL(ChargeController::min_charging_voltage, chgVoltagePin->getPinValue()); // and charging voltage should be set to the lowest level
 }
 
+void whenHighVoltageLimitApproachedReduceChargingCurrent()
+{
+    acConnStatus->setPinValue(0);     // when charger plugged in to mains AC
+    pack->setHighestCellVoltage(3.8); // and all cells below the voltage limit
+    myCC->service();
+    TEST_ASSERT_EQUAL(CHARGING, myCC->state); // The charge controller should be in the CHARGING state
+    TEST_ASSERT_EQUAL(0x00, chgCurrentPin->getPinValue());  // and full charging current should be applied
+
+    pack->setHighestCellVoltage(4.18); // then if the voltage approaches the limit
+    myCC->service();
+    TEST_ASSERT_EQUAL(0x70, chgCurrentPin->getPinValue());  // the charging current should be reduced
+    
+    myCC->service();    // and if the voltage remains near or approaches the limit again
+    TEST_ASSERT_EQUAL(0xB0, chgCurrentPin->getPinValue());  // the charging current should be reduced further
+
+    myCC->service();    // and if the voltage remains near or approaches the limit again
+    TEST_ASSERT_EQUAL(0xD0, chgCurrentPin->getPinValue());  // the charging current should be reduced further
+
+    myCC->service();    // and if the voltage remains near or approaches the limit again
+    TEST_ASSERT_EQUAL(0xE7, chgCurrentPin->getPinValue());  // the charging current should be reduced further
+
+}
+
 void whenUnderMinimumTemperatureDontCharge()
 {
     pack->setLowestTemperature(0.5); // when it is too cold for charging
@@ -105,6 +128,7 @@ int main(int argc, char **argv)
     UNITY_BEGIN();
 
     RUN_TEST(whenACConnectedStartCharge);
+    RUN_TEST(whenHighVoltageLimitApproachedReduceChargingCurrent);
     RUN_TEST(whenCellHighVoltageLimitReachedStopCharge);
     RUN_TEST(whenUnderMinimumTemperatureDontCharge);
     RUN_TEST(whenOverMaximumTemperatureDontCharge);

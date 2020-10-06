@@ -64,14 +64,14 @@ float MercBclassModule::getLowestTemperatureNow()
 {
     float lowestTemp = moduleA->getTemperature(0);
 
-    if(lowestTemp > moduleA->getTemperature(1))     //two temperature sensors per module - but it isn't clear if the second one does anything!
-        lowestTemp =  moduleA->getTemperature(1);
+    //if(lowestTemp > moduleA->getTemperature(1))     //two temperature sensors per module - but it isn't clear if the second one does anything!
+    //    lowestTemp =  moduleA->getTemperature(1);
 
     if(lowestTemp > moduleB->getTemperature(0))
         lowestTemp =  moduleB->getTemperature(0);
 
-    if(lowestTemp > moduleB->getTemperature(1))
-        lowestTemp =  moduleB->getTemperature(1);
+    //if(lowestTemp > moduleB->getTemperature(1))
+    //    lowestTemp =  moduleB->getTemperature(1);
 
     return lowestTemp;    
 }
@@ -80,14 +80,14 @@ float MercBclassModule::getHighestTemperatureNow()
 {
     float highestTemp = moduleA->getTemperature(0);
 
-    if(highestTemp < moduleA->getTemperature(1))
-        highestTemp =  moduleA->getTemperature(1);
+    //if(highestTemp < moduleA->getTemperature(1))
+    //    highestTemp =  moduleA->getTemperature(1);
 
     if(highestTemp < moduleB->getTemperature(0))
         highestTemp =  moduleB->getTemperature(0);
 
-    if(highestTemp < moduleB->getTemperature(1))
-        highestTemp =  moduleB->getTemperature(1);    
+    //if(highestTemp < moduleB->getTemperature(1))
+    //    highestTemp =  moduleB->getTemperature(1);    
 
     return highestTemp; 
 }

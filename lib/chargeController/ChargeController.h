@@ -23,6 +23,10 @@ private:
     void stopCharging(void);
     uint32_t chargingCurrent;
     uint32_t chargingVoltage;
+    const uint8_t numCurrentLevels = 5;
+    const uint8_t current_levels[5] = {0x00, 0x70, 0xB0, 0xD0, 0xE7};   //increasing values limit the current more...
+    const float currentReductionApproach = 0.2;       // how many volts below the limit current reduction should kick in
+    uint8_t currentLevel = 0;
 public:
     ChargerState state;
     ChargeController(PinInterface *acPin, PinInterface *ccPin, PinInterface *vcPin, GwizPackInterface *pack);

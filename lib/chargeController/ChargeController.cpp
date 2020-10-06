@@ -53,6 +53,16 @@ void ChargeController::service(void)
             stopCharging();
             state = CHARGE_COMPLETE;
         }
+        else
+        {
+            if ((myPack->getHighestCellVoltage() >= settings.OverVSetpoint - currentReductionApproach) && (currentLevel < numCurrentLevels ))
+            {   //reduce the current level as we approach the voltage limit
+                currentLevel++;         
+                chargingCurrent = current_levels[currentLevel];
+                currentControlPin->doAnalogWrite(chargingCurrent);
+            }
+        }
+        
         if (myPack->getLowestTemperature() <= settings.UnderTSetpoint)
         {
             stopCharging();
@@ -84,7 +94,8 @@ void ChargeController::service(void)
 void ChargeController::startCharging(void)
 {
     state = CHARGING;
-    chargingCurrent = max_charging_current;
+    currentLevel = 0;
+    chargingCurrent = current_levels[currentLevel];
     chargingVoltage = max_charging_voltage;
     currentControlPin->doAnalogWrite(chargingCurrent);
     voltageControlPin->doAnalogWrite(chargingVoltage);
