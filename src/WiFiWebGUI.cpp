@@ -1,9 +1,10 @@
 #include <WiFiWebGUI.h>
 #include <config.h>
 
-WiFiWebGUI::WiFiWebGUI(GwizPackInterface *pack)
+WiFiWebGUI::WiFiWebGUI(GwizPackInterface *pack, CurrentSensor *currentSensor)
 {
     myPack = pack;
+    myCurrentSensor = currentSensor;
 }
 
 void WiFiWebGUI::init(void)
@@ -80,6 +81,14 @@ void WiFiWebGUI::handleWiFiCmd(void)
                 {
                     SERIALWIFI.print(myPack->getHighestTemperature(), 1);
                     SERIALWIFI.print("r\n");
+                }
+                else 
+                {
+                    if (argString == String("ibat"))
+                    {
+                        SERIALWIFI.print(myCurrentSensor->getCurrentInAmps(), 2);
+                        SERIALWIFI.print("r\n");
+                    }
                 }
             }
             i++; //skip over separator

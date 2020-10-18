@@ -10,6 +10,7 @@
 #include "DeviceDrivers/IOPin.h"
 #include <ChargeController.h>
 #include <WiFiWebGUI.h>
+#include "CurrentSensor.h"
 
 //#define BMS_BAUD  612500
 #define BMS_BAUD 617647
@@ -26,9 +27,11 @@ uint32_t lastUpdate;
 IOPin acDetectionPin(CRG_AC_AVAIL_PORT);
 IOPin chgCurrentPin(CHG_CURRENT_PORT);
 IOPin chgVoltagePin(CHG_VOLTAGE_PORT);
+CurrentSensor currentSensor;
 
 ChargeController chargeController(&acDetectionPin, &chgCurrentPin, &chgVoltagePin, &gwiz);
-WiFiWebGUI webGUI(&gwiz);
+WiFiWebGUI webGUI(&gwiz, &currentSensor);
+
 
 #pragma GCC push_options
 #pragma GCC optimize ("O0") 
@@ -92,6 +95,7 @@ void setup()
 
     chargeController.init();
     webGUI.init();
+    currentSensor.init();    
 }
 
 void loop()
@@ -126,6 +130,8 @@ void loop()
 
             }
         }
+
+        currentSensor.service();
         
     }
 }

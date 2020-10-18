@@ -2,16 +2,18 @@
 #define __WIFI_WEB_GUI_H
 
 #include <GwizPackInterface.h>
+#include <CurrentSensor.h>
 
 class WiFiWebGUI
 {
 private:
     GwizPackInterface *myPack;
+    CurrentSensor *myCurrentSensor;
     char cmdBuffer[80];
     int ptrBuffer;
 
 public:
-    WiFiWebGUI(GwizPackInterface *pack);
+    WiFiWebGUI(GwizPackInterface *pack, CurrentSensor *currentSensor);
     void init(void);
     void service(void);
     void mySerialEvent(void);
