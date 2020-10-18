@@ -21,7 +21,10 @@ void ChargeController::service(void)
 {
     if (acConnectedPin->doDigitalRead()) //anytime the AC cable is disconnected jump back to the idle state
     {
-        stopCharging();
+        if(state != IDLE)
+        {
+            stopCharging();
+        }
     }
 
     switch (state)
