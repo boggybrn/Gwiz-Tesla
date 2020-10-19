@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "CurrentSensor.h"
 #include "config.h"
+#include "Logger.h"
 
 float CurrentSensor::getCurrentInAmps(void)
 {
@@ -23,7 +24,7 @@ void CurrentSensor::service(void)
         //    SERIALCONSOLE.printf("%x", canRxbytes[i]);
         //}
 
-        uint32_t inbox;
+        uint32_t inbox=0;
         for (int i = 0; i < 4; i++)
         {
             inbox = (inbox << 8) | canRxbytes[i];
@@ -37,12 +38,7 @@ void CurrentSensor::service(void)
         {
             CANmilliamps = (0x80000000 - CANmilliamps) * -1;
         }
-
-        if (1) // ToDo make this depend on the logging level
-        {
-            SERIALCONSOLE.print("Current = ");
-            SERIALCONSOLE.print(CANmilliamps);
-            SERIALCONSOLE.print("mA \r\n");
-        }
+        
+        Logger::info("Current = %dmA", CANmilliamps);
     }
 }
