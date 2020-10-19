@@ -20,6 +20,7 @@
 #define CHG_AC_AVAIL        0       // low signifies that AC is connected
 #define CHG_CURRENT_PORT    PB14
 #define CHG_VOLTAGE_PORT    PB13
+#define CHG_FAN_PORT        PB4
 
 #define REG_DEV_STATUS      0
 #define REG_GPAI            1

@@ -3,12 +3,13 @@
 
 extern EEPROMSettings settings;
 
-ChargeController::ChargeController(PinInterface *acPin, PinInterface *ccPin, PinInterface *vcPin, GwizPackInterface *pack)
+ChargeController::ChargeController(PinInterface *acPin, PinInterface *ccPin, PinInterface *vcPin, PinInterface *fanPin, GwizPackInterface *pack)
 {
     state = IDLE;
     acConnectedPin = acPin;
     currentControlPin = ccPin;
     voltageControlPin = vcPin;
+    fanControlPin = fanPin;
 
     myPack = pack;
 }
@@ -102,6 +103,7 @@ void ChargeController::startCharging(void)
     chargingVoltage = max_charging_voltage;
     currentControlPin->doAnalogWrite(chargingCurrent);
     voltageControlPin->doAnalogWrite(chargingVoltage);
+    fanControlPin->doDigitalWrite(CHG_FAN_ON);
 }
 
 void ChargeController::stopCharging(void)
@@ -111,4 +113,5 @@ void ChargeController::stopCharging(void)
     chargingVoltage = min_charging_voltage;
     currentControlPin->doAnalogWrite(chargingCurrent);
     voltageControlPin->doAnalogWrite(chargingVoltage);
+    fanControlPin->doDigitalWrite(CHG_FAN_OFF);
 }

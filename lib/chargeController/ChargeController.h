@@ -3,6 +3,9 @@
 #include <PinInterface.h>
 #include <GwizPackInterface.h>
 
+#define CHG_FAN_OFF 0
+#define CHG_FAN_ON  1
+
 typedef enum ChargerState 
 {
     IDLE,
@@ -18,6 +21,7 @@ private:
     PinInterface *acConnectedPin;
     PinInterface *currentControlPin;
     PinInterface *voltageControlPin;
+    PinInterface *fanControlPin;
     GwizPackInterface *myPack;
     void startCharging(void);
     void stopCharging(void);
@@ -29,7 +33,7 @@ private:
     uint8_t currentLevel = 0;
 public:
     ChargerState state;
-    ChargeController(PinInterface *acPin, PinInterface *ccPin, PinInterface *vcPin, GwizPackInterface *pack);
+    ChargeController(PinInterface *acPin, PinInterface *ccPin, PinInterface *vcPin, PinInterface *fanPin, GwizPackInterface *pack);
     void init(void);
     void service(void);
     static const uint32_t max_charging_current = 0;    // the output of the control pins are inverted, hence the values here!

@@ -27,9 +27,10 @@ uint32_t lastUpdate;
 IOPin acDetectionPin(CRG_AC_AVAIL_PORT);
 IOPin chgCurrentPin(CHG_CURRENT_PORT);
 IOPin chgVoltagePin(CHG_VOLTAGE_PORT);
+IOPin chgFanSwitch(CHG_FAN_PORT);
 CurrentSensor currentSensor;
 
-ChargeController chargeController(&acDetectionPin, &chgCurrentPin, &chgVoltagePin, &gwiz);
+ChargeController chargeController(&acDetectionPin, &chgCurrentPin, &chgVoltagePin, &chgFanSwitch, &gwiz);
 WiFiWebGUI webGUI(&gwiz, &currentSensor);
 
 
@@ -85,10 +86,12 @@ void setup()
     pinMode(LED_BUILTIN, OUTPUT);
     digitalWrite(LED_BUILTIN, HIGH); // turn the LED on
 
-    // initialise the PWM pins for charger current control
+    // initialise the pins for charger current control
     pinMode(CRG_AC_AVAIL_PORT, INPUT); // pin to detect when the charger is plugged in to 230V AC
-    pinMode(CHG_CURRENT_PORT, OUTPUT); // pin to control charging current
-    pinMode(CHG_VOLTAGE_PORT, OUTPUT); //pin to control charging voltage
+    pinMode(CHG_CURRENT_PORT, OUTPUT); // PWM pin to control charging current
+    pinMode(CHG_VOLTAGE_PORT, OUTPUT); // PWM pin to control charging voltage
+    pinMode(CHG_FAN_PORT, OUTPUT);     // pin to switch on / off the charger cooling fan
+    digitalWrite(CHG_FAN_PORT, LOW);   // switch the fan off   
 
     analogWrite(CHG_VOLTAGE_PORT, 255); // set the minimum voltage to ensure that the charger is off
     analogWrite(CHG_CURRENT_PORT, 225); // and set to the minimum current by default

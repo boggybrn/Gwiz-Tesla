@@ -10,6 +10,7 @@ ChargeController *myCC;
 MockIOPin *acConnStatus;
 MockIOPin *chgCurrentPin;
 MockIOPin *chgVoltagePin;
+MockIOPin *chgFanPin;
 MockGwizPack *pack;
 EEPROMSettings settings;
 
@@ -17,14 +18,16 @@ void setUp(void)
 {
     acConnStatus = new MockIOPin((uint32_t)1);
     chgCurrentPin = new MockIOPin((uint32_t)2);
-    chgVoltagePin = new MockIOPin((uint32_t)2);
+    chgVoltagePin = new MockIOPin((uint32_t)3);
+    chgFanPin = new MockIOPin((uint32_t)4);
 
     pack = new MockGwizPack();
 
-    myCC = new ChargeController(acConnStatus, chgCurrentPin, chgVoltagePin, pack);
+    myCC = new ChargeController(acConnStatus, chgCurrentPin, chgVoltagePin, chgFanPin, pack);
     acConnStatus->setPinValue(1); // starting point is tht AC is not connected
     chgCurrentPin->setPinValue(22);
     chgVoltagePin->setPinValue(33);
+    chgFanPin->setPinValue(0);     // Fan switched off 
     settings.OverVSetpoint = 4.2;  // cell voltage upper limit
     settings.UnderVSetpoint = 3.1; //cell vlotage lower limit
     settings.OverTSetpoint = 65;   //charging temperature upper limit
@@ -54,10 +57,12 @@ void whenACConnectedStartCharge()
     TEST_ASSERT_EQUAL(CHARGING, myCC->state); // Then the charge controller should change to the CHARGING state
     TEST_ASSERT_EQUAL(ChargeController::max_charging_current, chgCurrentPin->getPinValue()); // and full charging current should be enabled
     TEST_ASSERT_EQUAL(ChargeController::max_charging_voltage, chgVoltagePin->getPinValue()); // and full charging voltage should be permitted
+    TEST_ASSERT_EQUAL(1, chgFanPin->getPinValue());     // and the charger cooling fan should be switched on
 
     acConnStatus->setPinValue(1); // when charger disconnected from mains
     myCC->service();
     TEST_ASSERT_EQUAL(IDLE, myCC->state); // Then the charge controller should go back to the idle state
+    TEST_ASSERT_EQUAL(0, chgFanPin->getPinValue());     // and the charger cooling fan should be switched off
 }
 
 void whenCellHighVoltageLimitReachedStopCharge()
