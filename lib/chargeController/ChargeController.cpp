@@ -22,7 +22,7 @@ void ChargeController::service(void)
 {
     if (acConnectedPin->doDigitalRead()) //anytime the AC cable is disconnected jump back to the idle state
     {
-        if(state != IDLE)
+        if (state != IDLE)
         {
             stopCharging();
         }
@@ -59,14 +59,14 @@ void ChargeController::service(void)
         }
         else
         {
-            if ((myPack->getHighestCellVoltage() >= settings.OverVSetpoint - currentReductionApproach) && (currentLevel < numCurrentLevels ))
-            {   //reduce the current level as we approach the voltage limit
-                currentLevel++;         
+            if ((myPack->getHighestCellVoltage() >= settings.OverVSetpoint - currentReductionApproach) && (currentLevel < numCurrentLevels))
+            { //reduce the current level as we approach the voltage limit
+                currentLevel++;
                 chargingCurrent = current_levels[currentLevel];
                 currentControlPin->doAnalogWrite(chargingCurrent);
             }
         }
-        
+
         if (myPack->getLowestTemperature() <= settings.UnderTSetpoint)
         {
             stopCharging();
@@ -88,6 +88,39 @@ void ChargeController::service(void)
         }
         break;
     }
+}
+
+ChargerStartError ChargeController::manualStart(void)
+{
+    ChargerStartError retVal = STARTED;
+    if (!acConnectedPin->doDigitalRead())
+    {
+        if (myPack->getLowestTemperature() <= settings.UnderTSetpoint)
+        {
+            retVal = TOO_COLD_TO_START;
+        }
+        else
+        {
+            if (myPack->getHighestTemperature() >= settings.OverTSetpoint)
+            {
+                retVal = TOO_HOT_TO_START;
+            }
+            else
+            {
+                startCharging();
+            }
+        }
+    }
+    else
+    {
+        retVal = NO_AC_CONNECTED;
+    }
+    return retVal;
+}
+
+void ChargeController::manualStop(void)
+{
+    stopCharging();
 }
 
 /*

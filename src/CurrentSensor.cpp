@@ -5,7 +5,16 @@
 
 float CurrentSensor::getCurrentInAmps(void)
 {
-    return (float)((float)CANmilliamps / 1000);
+    return -(float)((float)CANmilliamps / 1000);        // sign reversed for display ie -ve = charging, +ve = driving
+}
+
+signed long CurrentSensor::getChargeInmASeconds(void)
+{
+    return chargeInmASeconds;
+}
+void CurrentSensor::setChargeInmASeconds(signed long charge)
+{
+    chargeInmASeconds = charge;
 }
 
 void CurrentSensor::init(void)
@@ -24,7 +33,7 @@ void CurrentSensor::service(void)
         //    SERIALCONSOLE.printf("%x", canRxbytes[i]);
         //}
 
-        uint32_t inbox=0;
+        uint32_t inbox = 0;
         for (int i = 0; i < 4; i++)
         {
             inbox = (inbox << 8) | canRxbytes[i];
@@ -38,7 +47,10 @@ void CurrentSensor::service(void)
         {
             CANmilliamps = (0x80000000 - CANmilliamps) * -1;
         }
-        
+
         Logger::info("Current = %dmA", CANmilliamps);
+
+        chargeInmASeconds += CANmilliamps;              //note that this assumes service() is called once a second!
+        Logger::info("Charge = %lmAS", chargeInmASeconds);
     }
 }

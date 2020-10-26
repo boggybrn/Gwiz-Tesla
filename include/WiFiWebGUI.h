@@ -3,17 +3,19 @@
 
 #include <GwizPackInterface.h>
 #include <CurrentSensor.h>
+#include <ChargeController.h>
 
 class WiFiWebGUI
 {
 private:
     GwizPackInterface *myPack;
     CurrentSensor *myCurrentSensor;
+    ChargeController *myChargeController;
     char cmdBuffer[80];
     int ptrBuffer;
 
 public:
-    WiFiWebGUI(GwizPackInterface *pack, CurrentSensor *currentSensor);
+    WiFiWebGUI(GwizPackInterface *pack, CurrentSensor *currentSensor, ChargeController *chargeController);
     void init(void);
     void service(void);
     void mySerialEvent(void);

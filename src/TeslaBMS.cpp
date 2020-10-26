@@ -31,7 +31,7 @@ IOPin chgFanSwitch(CHG_FAN_PORT);
 CurrentSensor currentSensor;
 
 ChargeController chargeController(&acDetectionPin, &chgCurrentPin, &chgVoltagePin, &chgFanSwitch, &gwiz);
-WiFiWebGUI webGUI(&gwiz, &currentSensor);
+WiFiWebGUI webGUI(&gwiz, &currentSensor, &chargeController);
 
 
 #pragma GCC push_options
@@ -51,6 +51,7 @@ void loadSettings()
     settings.balanceVoltage = 3.9f;
     settings.balanceHyst = 0.04f;
     settings.balanceTollerance = 0.005f;
+    settings.chargeInmASeconds = 360000000;     //equivalent to 100Ah
     settings.logLevel = 2;
     EEPROM.put(EEPROM_PAGE, settings);
     }
@@ -99,6 +100,7 @@ void setup()
     chargeController.init();
     webGUI.init();
     currentSensor.init();    
+    currentSensor.setChargeInmASeconds(settings.chargeInmASeconds);
 }
 
 void loop()

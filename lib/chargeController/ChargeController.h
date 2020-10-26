@@ -15,6 +15,14 @@ typedef enum ChargerState
     TOO_HOT_TO_CHARGE
 } ChargerState;
 
+typedef enum ChargerStartError
+{
+    STARTED,
+    TOO_COLD_TO_START,
+    TOO_HOT_TO_START,
+    NO_AC_CONNECTED
+} ChargerStartError;
+
 class ChargeController
 {
 private:
@@ -28,7 +36,7 @@ private:
     uint32_t chargingCurrent;
     uint32_t chargingVoltage;
     const uint8_t numCurrentLevels = 5;
-    const uint8_t current_levels[5] = {0x00, 0x70, 0xB0, 0xD0, 0xE7};   //increasing values limit the current more...
+    const uint8_t current_levels[5] = {0x00, 0x50, 0xA0, 0xD0, 0xE7};   //increasing values limit the current more...
     const float currentReductionApproach = 0.04;       // how many volts below the limit current reduction should kick in
     uint8_t currentLevel = 0;
 public:
@@ -36,6 +44,8 @@ public:
     ChargeController(PinInterface *acPin, PinInterface *ccPin, PinInterface *vcPin, PinInterface *fanPin, GwizPackInterface *pack);
     void init(void);
     void service(void);
+    ChargerStartError manualStart(void);
+    void manualStop(void);
     static const uint32_t max_charging_current = 0;    // the output of the control pins are inverted, hence the values here!
     static const uint32_t min_charging_current = 255;
     static const uint32_t max_charging_voltage = 0;    

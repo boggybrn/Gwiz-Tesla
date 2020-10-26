@@ -1,10 +1,12 @@
 #include <WiFiWebGUI.h>
 #include <config.h>
+#include <ChargeController.h>
 
-WiFiWebGUI::WiFiWebGUI(GwizPackInterface *pack, CurrentSensor *currentSensor)
+WiFiWebGUI::WiFiWebGUI(GwizPackInterface *pack, CurrentSensor *currentSensor, ChargeController *chargeControler)
 {
     myPack = pack;
     myCurrentSensor = currentSensor;
+    myChargeController = chargeControler;
 }
 
 void WiFiWebGUI::init(void)
@@ -72,7 +74,7 @@ void WiFiWebGUI::handleWiFiCmd(void)
             }
             if (argString == String("vbat"))
             {
-                SERIALWIFI.print(myPack->getGwizPackVoltage(), 1);       
+                SERIALWIFI.print(myPack->getGwizPackVoltage(), 1);
                 SERIALWIFI.print("\r\n");
             }
             else
@@ -80,20 +82,52 @@ void WiFiWebGUI::handleWiFiCmd(void)
                 if (argString == String("tbat"))
                 {
                     SERIALWIFI.print(myPack->getHighestTemperature(), 1);
-                    SERIALWIFI.print("r\n");
+                    SERIALWIFI.print("\r\n");
                 }
-                else 
+                else
                 {
                     if (argString == String("ibat"))
                     {
                         SERIALWIFI.print(myCurrentSensor->getCurrentInAmps(), 2);
-                        SERIALWIFI.print("r\n");
+                        SERIALWIFI.print("\r\n");
+                    }
+                    else
+                    {
+                        if (argString == String("cbat"))
+                        {
+                            float chargeInAH = (float)(myCurrentSensor->getChargeInmASeconds() / 3600) / 1000; //return in AH for display
+                            SERIALWIFI.print((float)(chargeInAH), 2);   
+                            SERIALWIFI.print("\r\n");
+                        }
                     }
                 }
             }
             i++; //skip over separator
             argString = String("");
         }
+    }
+    else if (cmdString == String("start"))
+    {
+        switch (myChargeController->manualStart())
+        {
+        case STARTED:
+            SERIALWIFI.print("\nCharging Started\r\n");
+            break;
+        case TOO_COLD_TO_START:
+            SERIALWIFI.print("\nToo cold to charge\r\n");
+            break;
+        case TOO_HOT_TO_START:
+            SERIALWIFI.print("\nToo hot to charge\r\n");
+            break;
+        case NO_AC_CONNECTED:
+            SERIALWIFI.print("\nNot plugged in to AC power\r\n");
+            break;
+        }
+    }
+    else if (cmdString == String("stop"))
+    {
+        myChargeController->manualStop();
+        SERIALWIFI.print("\nCharging Stopped\r\n");
     }
     else
     {

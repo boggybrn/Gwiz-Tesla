@@ -11,4 +11,5 @@ typedef struct {
     float balanceVoltage;
     float balanceHyst;
     float balanceTollerance;
+    signed long chargeInmASeconds;
 } EEPROMSettings;

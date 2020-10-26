@@ -110,6 +110,7 @@ void SerialConsole::printMenu()
     Logger::console("   BALVOLT=%f - Voltage at which to begin cell balancing", settings.balanceVoltage);
     Logger::console("   BALHYST=%f - How far voltage must dip before balancing is turned off", settings.balanceHyst);
     Logger::console("   BALTOL=%f - Tollerance from lowest cell to trigger balancing in another cell", settings.balanceTollerance);
+    Logger::console("   CHARGE=%l - Charge in Battery in mA Seconds", settings.chargeInmASeconds);
 
     float OverVSetpoint;
     float UnderVSetpoint;
@@ -194,7 +195,6 @@ void SerialConsole::handleConfigCmd()
     // strtol() is able to parse also hex values (e.g. a string "0xCAFE"), useful for enable/disable by device id
     newValue = strtol((char *)(cmdBuffer + i), NULL, 0);
     newFloat = strtof((char *)(cmdBuffer + i), NULL);
-
     cmdString.toUpperCase();
 
     if (cmdString == String("LOGLEVEL"))
@@ -326,6 +326,12 @@ void SerialConsole::handleConfigCmd()
         }
         else
             Logger::console("Invalid pwm setting - it should be < 255");
+    }
+    else if (cmdString == String("CHARGE"))
+    {
+        settings.chargeInmASeconds = newValue;
+        needEEPROMWrite = true;
+        Logger::console("Charge in battery set to %l", settings.chargeInmASeconds);
     }
     else
     {
