@@ -87,6 +87,14 @@ void ChargeController::service(void)
             startCharging();
         }
         break;
+
+    case CHARGE_COMPLETE:
+        if (myPack->getHighestCellVoltage() <  settings.OverVSetpoint - voltageDropToReenableCharging)
+        {
+            state = IDLE;
+        }
+        break;
+
     }
 }
 

@@ -79,6 +79,26 @@ void whenCellHighVoltageLimitReachedStopCharge()
     TEST_ASSERT_EQUAL(ChargeController::min_charging_voltage, chgVoltagePin->getPinValue()); // and charging voltage should be set to the lowest level
 }
 
+void whenChargingCompleteButVoltageFallsReturnToIdleAndStartCharging()
+{
+    acConnStatus->setPinValue(0);     // when charger plugged in to mains AC
+    pack->setHighestCellVoltage(3.8); // and all cells below the voltage limit
+    myCC->service();
+    TEST_ASSERT_EQUAL(CHARGING, myCC->state); // The charge controller should be in the CHARGING state
+
+    pack->setHighestCellVoltage(4.2); // then if the voltage reaches the limit
+    myCC->service();
+    TEST_ASSERT_EQUAL(CHARGE_COMPLETE, myCC->state); // charging should stop
+
+    pack->setHighestCellVoltage(3.94); // then if the voltage falls below the threshold to trigger charging again
+    myCC->service();
+
+    TEST_ASSERT_EQUAL(IDLE, myCC->state);   // it should flip back to the idle state
+    myCC->service();
+    TEST_ASSERT_EQUAL(CHARGING, myCC->state);   //before sharting to charge again
+
+}
+
 void whenHighVoltageLimitApproachedReduceChargingCurrent()
 {
     acConnStatus->setPinValue(0);     // when charger plugged in to mains AC
@@ -89,10 +109,10 @@ void whenHighVoltageLimitApproachedReduceChargingCurrent()
 
     pack->setHighestCellVoltage(4.18); // then if the voltage approaches the limit
     myCC->service();
-    TEST_ASSERT_EQUAL(0x70, chgCurrentPin->getPinValue());  // the charging current should be reduced
+    TEST_ASSERT_EQUAL(0x50, chgCurrentPin->getPinValue());  // the charging current should be reduced
     
     myCC->service();    // and if the voltage remains near or approaches the limit again
-    TEST_ASSERT_EQUAL(0xB0, chgCurrentPin->getPinValue());  // the charging current should be reduced further
+    TEST_ASSERT_EQUAL(0xA0, chgCurrentPin->getPinValue());  // the charging current should be reduced further
 
     myCC->service();    // and if the voltage remains near or approaches the limit again
     TEST_ASSERT_EQUAL(0xD0, chgCurrentPin->getPinValue());  // the charging current should be reduced further
@@ -135,6 +155,7 @@ int main(int argc, char **argv)
     RUN_TEST(whenACConnectedStartCharge);
     RUN_TEST(whenHighVoltageLimitApproachedReduceChargingCurrent);
     RUN_TEST(whenCellHighVoltageLimitReachedStopCharge);
+    RUN_TEST(whenChargingCompleteButVoltageFallsReturnToIdleAndStartCharging);
     RUN_TEST(whenUnderMinimumTemperatureDontCharge);
     RUN_TEST(whenOverMaximumTemperatureDontCharge);
 

@@ -38,6 +38,8 @@ private:
     const uint8_t numCurrentLevels = 5;
     const uint8_t current_levels[5] = {0x00, 0x50, 0xA0, 0xD0, 0xE7};   //increasing values limit the current more...
     const float currentReductionApproach = 0.04;       // how many volts below the limit current reduction should kick in
+    const float voltageDropToReenableCharging = 0.15;  // if left plugged in to the AC after a charge, charging will start again after this cell voltage drop. 
+                                                       // Mostly so the pre-heating can be run after charging without draining the battery
     uint8_t currentLevel = 0;
 public:
     ChargerState state;
