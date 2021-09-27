@@ -1,6 +1,11 @@
 #include <WiFiWebGUI.h>
 #include <config.h>
 #include <ChargeController.h>
+#include <EEPROM.h>
+#include "BMSModuleManager.h"
+
+extern EEPROMSettings settings;
+extern BMSModuleManager bms;
 
 WiFiWebGUI::WiFiWebGUI(GwizPackInterface *pack, CurrentSensor *currentSensor, ChargeController *chargeControler)
 {
@@ -106,31 +111,55 @@ void WiFiWebGUI::handleWiFiCmd(void)
             argString = String("");
         }
     }
-    else if (cmdString == String("start"))
+    else if (cmdString == String("status"))
     {
-        switch (myChargeController->manualStart())
-        {
-        case STARTED:
-            SERIALWIFI.print("\nCharging Started\r\n");
-            break;
-        case TOO_COLD_TO_START:
-            SERIALWIFI.print("\nToo cold to charge\r\n");
-            break;
-        case TOO_HOT_TO_START:
-            SERIALWIFI.print("\nToo hot to charge\r\n");
-            break;
-        case NO_AC_CONNECTED:
-            SERIALWIFI.print("\nNot plugged in to AC power\r\n");
-            break;
-        }
+        String status = "";
+        myPack->getPackDetails(&status);
+        SERIALWIFI.print(status);
     }
-    else if (cmdString == String("stop"))
+    else if (cmdString == String("settings"))
     {
-        myChargeController->manualStop();
-        SERIALWIFI.print("\nCharging Stopped\r\n");
+        String reply = "";
+        reply += "Max cell limit " + String(settings.OverVSetpoint) + "V\n";
+        reply += "Max charging temperature " + String(settings.OverTSetpoint) + "C\n";
+        reply += "Min charging temperature " + String(settings.UnderTSetpoint) + "C\n";
+        reply += "Balance above Voltage " + String(settings.balanceVoltage) + "V\n";
+        reply += "Difference to trigger balancing " + String(settings.balanceHyst) + "V\n";
+        reply += "Default full capacity " + String(settings.chargeInmASeconds / (3600*1000)) + "Ah";
+        SERIALWIFI.print(reply);
+    }
+    else if (cmdString == String("VOLTLIMHI"))
+    {
+        i++; //skip over the space
+        float newFloat = strtof((char *)(cmdBuffer + i), NULL);
+        if (newFloat >= 3.7f && newFloat <= 4.2f)
+        {
+            settings.OverVSetpoint = newFloat;
+            String reply = "";
+            reply += "\nMax cell limit " + String(newFloat) + "V\r\n";
+            SERIALWIFI.print(reply);
+            EEPROM.put(EEPROM_PAGE, settings); 
+        }
+        else
+        {
+            SERIALWIFI.print("\nValue out of range\r\n");
+        }
+        
+            
+    }
+    else if (cmdString == String("BAL"))
+    {
+        i++; //skip over the space
+        int balanceTime = strtol((char *)(cmdBuffer + i), NULL, 0);
+        if(balanceTime > 200)
+            balanceTime = 200;
+        bms.balanceCells(myPack->getLowestCellVoltage(), balanceTime, 1);
+        String reply = "";
+        reply += "\nBalancing for " + String(balanceTime) + " seconds\r\n";
+        SERIALWIFI.print(reply);
     }
     else
     {
-        SERIALWIFI.print("\nUnknown Command\r\n");
+        SERIALWIFI.print("\nUnknown Command!\r\n");
     }
 }

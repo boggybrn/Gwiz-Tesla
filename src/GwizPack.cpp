@@ -130,3 +130,39 @@ void GwizPack::printPackDetails()
 
     SerialUSB.print("\n");
 }
+
+void GwizPack::getPackDetails(String *details)
+{
+
+    details->concat("Chain1 ModuleA voltage ");
+    details->concat(String(chain1ModuleA.getMercModuleVoltage(), 3));
+    chain1ModuleA.getCellVotages(details);
+
+    details->concat("\nChain1 ModuleB voltage ");
+    details->concat(String(chain1ModuleB.getMercModuleVoltage(), 3));
+    chain1ModuleB.getCellVotages(details);
+
+    details->concat("\nChain2 ModuleA voltage ");
+    details->concat(String(chain2ModuleA.getMercModuleVoltage(), 3));
+    chain2ModuleA.getCellVotages(details);
+
+    details->concat("\nChain2 ModuleB voltage ");
+    details->concat(String(chain2ModuleA.getMercModuleVoltage(), 3));
+    chain2ModuleB.getCellVotages(details);
+
+    details->concat("\nHighest cell voltage ");
+    details->concat(String(getHighestCellVoltage(), 3));
+
+    details->concat("  Lowest cell voltage ");
+    details->concat(String(getLowestCellVoltage(), 3));
+
+    details->concat("  Cell voltage difference ");
+    details->concat(String(getHighestCellVoltage() - getLowestCellVoltage(), 3));
+
+    details->concat("\nHighest temperature ");
+    details->concat(String(getHighestTemperature(), 2));
+
+    details->concat("  Lowest temperature ");
+    details->concat(String(getLowestTemperature(), 2));
+
+}

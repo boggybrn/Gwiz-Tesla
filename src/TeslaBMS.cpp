@@ -11,6 +11,7 @@
 #include <ChargeController.h>
 #include <WiFiWebGUI.h>
 #include "CurrentSensor.h"
+#include "Bluetooth.h"
 
 //#define BMS_BAUD  612500
 #define BMS_BAUD 617647
@@ -32,6 +33,7 @@ CurrentSensor currentSensor;
 
 ChargeController chargeController(&acDetectionPin, &chgCurrentPin, &chgVoltagePin, &chgFanSwitch, &gwiz);
 WiFiWebGUI webGUI(&gwiz, &currentSensor, &chargeController);
+//Bluetooth bluetooth(&gwiz, &currentSensor, &chargeController);
 
 
 #pragma GCC push_options
@@ -65,7 +67,7 @@ void loadSettings()
 void setup()
 {
 
-    SERIALCONSOLE.begin(115200);
+    SERIALCONSOLE.begin(115200);    
     SERIALCONSOLE.println("Starting up!");
     SERIAL.begin(BMS_BAUD);
 
@@ -99,6 +101,7 @@ void setup()
 
     chargeController.init();
     webGUI.init();
+    //bluetooth.init();
     currentSensor.init();    
     currentSensor.setChargeInmASeconds(settings.chargeInmASeconds);
 }
@@ -107,9 +110,11 @@ void loop()
 {
     static bool ledState = false;
     static int chargerState = 0;
+   // static uint lowCurrentCount = 0;
     
     console.loop();
     webGUI.service();
+    //bluetooth.service();
 
     if (millis() > (lastUpdate + 1000))
     {
@@ -137,6 +142,17 @@ void loop()
         }
 
         currentSensor.service();
+       /* if(currentSensor.getCurrentInAmps() < 0.2)
+        {
+            if(lowCurrentCount < 60)
+            {
+                lowCurrentCount++;
+            }
+        }
+        else
+        {
+            lowCurrentCount = 0;
+        } */
         
     }
 }
