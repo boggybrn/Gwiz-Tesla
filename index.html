@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+<head>
+<!--
+ * This file is part of the esp8266 web interface
+ *
+ * Copyright (C) 2018 Johannes Huebner <dev@johanneshuebner.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+-->
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>G-Wiz with Merc B Class modules - battery monitor</title>
+<link href="style.css" rel="stylesheet" type="text/css" />
+<script src="chart.min.js" type="text/javascript"></script>
+<script src="inverter.js" type="text/javascript"></script>
+<script src="index.js" type="text/javascript"></script>
+</head>
+<body onload="onLoad()">
+<h1>G-Wiz with Merc B Class modules - battery monitor</h1>
+<h2 id="commands">Set max charge level</h2>
+<p>For a full charge set this to 4.2V per cell. Note that charging regularly to this level shortens the life of the battery. So use a lower level if you do not need the full range.</p>
+<p><button onclick="sendCmd('VOLTLIMHI 4.2');">4.2V/cell</button>
+   <button onclick="sendCmd('VOLTLIMHI 4.1');">4.1V/cell</button>
+   <button onclick="sendCmd('VOLTLIMHI 4.0');">4.0V/cell</button>
+   <button onclick="sendCmd('VOLTLIMHI 3.9');">3.9V/cell</button></p>
+
+<h2 id="commands">Commands</h2>
+<p><button onclick="sendCmd('status');">Show Status</button> 
+<button onclick="sendCmd('settings');">Show Settings</button></p>
+<p><input type="text" id="customcmd"/> <button onclick="sendCmd(document.getElementById('customcmd').value);">Send Custom Command</button></p>
+<p>Messages: <button onclick="clearMessages();">Clear</button></p>
+<pre><div id="message"></div></pre>
+
+<p><a href="/gauges.html?items=vbat,ibat,tbat">View Gauges</a>
+
+<p><a href="/wifi">Wifi Settings</a>
+
+<h2 id="update">Update</h2>
+<p>Upload file for updating this web interface.</p>
+<form id="uploadform" enctype="multipart/form-data" action="edit" method="POST">
+    <input id="updatefile" name="updatefile" type="file" onchange="fileSelected();" />
+    <input type="button" onclick="uploadFile();" value="Upload" />
+</form>
+<div id="progress" class="graph">
+<div id="bar" style="width: 0"></div>
+</div>
+
+
+<p>Copyright 2018 Johannes Huebner dev@johanneshuebner.com</p>
+<p>Charting by <a href="http://chartjs.org/" target="_blank">chart.js</a></p>
+<p>Gauges by <a href="https://github.com/Mikhus/canvas-gauges" target="_blank">Mykhailo Stadnyk</a></p>
+</body>
+</html>
