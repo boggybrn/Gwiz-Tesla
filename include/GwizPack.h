@@ -3,6 +3,7 @@
 #include "MercBclassModule.h"
 #include <GwizPackInterface.h>
 
+
 #define MODULES_IN_PACK 4
 
 class GwizPack : public GwizPackInterface
@@ -10,6 +11,7 @@ class GwizPack : public GwizPackInterface
 public:
     GwizPack(BMSModule *modules);
     float getGwizPackVoltage();
+    void getPackDetails(String *);
     void printPackDetails();
     float getHighestCellVoltage();
     float getLowestCellVoltage();

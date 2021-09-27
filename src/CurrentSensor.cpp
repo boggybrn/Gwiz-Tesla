@@ -3,6 +3,8 @@
 #include "config.h"
 #include "Logger.h"
 
+extern EEPROMSettings settings;
+
 float CurrentSensor::getCurrentInAmps(void)
 {
     return -(float)((float)CANmilliamps / 1000);        // sign reversed for display ie -ve = charging, +ve = driving
@@ -51,6 +53,10 @@ void CurrentSensor::service(void)
         Logger::info("Current = %dmA", CANmilliamps);
 
         chargeInmASeconds += CANmilliamps;              //note that this assumes service() is called once a second!
+        if(chargeInmASeconds > settings.chargeInmASeconds)
+        {
+            chargeInmASeconds = settings.chargeInmASeconds;     //limit to the maximum configured for the pack
+        }
         Logger::info("Charge = %lmAS", chargeInmASeconds);
     }
 }

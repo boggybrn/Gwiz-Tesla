@@ -8,6 +8,7 @@ public:
     MercBclassModule();
     void setModules(BMSModule *firstModule, BMSModule *secondModule);
     void printCellVotages();
+    void getCellVotages(String *);
     float getMercModuleVoltage();
     float getLowestCellVoltage();
     float getHighestCellVoltage();

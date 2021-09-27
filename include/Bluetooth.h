@@ -1,12 +1,11 @@
-#ifndef __WIFI_WEB_GUI_H
-#define __WIFI_WEB_GUI_H
+#ifndef __BLUETOOTH_H
+#define __BLUETOOTH_H
 
 #include <GwizPackInterface.h>
 #include <CurrentSensor.h>
 #include <ChargeController.h>
-#include <string>
 
-class WiFiWebGUI
+class Bluetooth
 {
 private:
     GwizPackInterface *myPack;
@@ -14,14 +13,15 @@ private:
     ChargeController *myChargeController;
     char cmdBuffer[80];
     int ptrBuffer;
+    bool rn4871InfoMode;
 
 public:
-    WiFiWebGUI(GwizPackInterface *pack, CurrentSensor *currentSensor, ChargeController *chargeController);
+    Bluetooth(GwizPackInterface *pack, CurrentSensor *currentSensor, ChargeController *chargeController);
     void init(void);
     void service(void);
     void mySerialEvent(void);
-    void handleWiFiCmd(void);
+    void handleBluetoothCmd(void);
 
 };
 
-#endif  //__WIFI_WEB_GUI_H
+#endif  //__BLUETOOTH_H

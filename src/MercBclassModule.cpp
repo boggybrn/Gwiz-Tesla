@@ -111,3 +111,23 @@ void MercBclassModule::printCellVotages()
         SerialUSB.print("V");
     }
 }
+
+void MercBclassModule::getCellVotages(String *voltages)
+{
+    for (int cellNum = 0; cellNum < cellsInModuleA; cellNum++)
+    {
+        voltages->concat("  Cell");
+        voltages->concat(cellNum);
+        voltages->concat(": ");
+        voltages->concat(String(moduleA->getCellVoltage(cellNum), 3));
+        voltages->concat("V");
+    }
+    for (int cellNum = 0; cellNum < cellsInModuleB; cellNum++)
+    {
+        voltages->concat("  Cell");
+        voltages->concat(cellNum + cellsInModuleA);
+        voltages->concat(": ");
+        voltages->concat(String(moduleB->getCellVoltage(cellNum), 3));
+        voltages->concat("V");
+    }
+}
