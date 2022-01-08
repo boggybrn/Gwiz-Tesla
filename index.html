@@ -29,9 +29,9 @@
 </head>
 <body onload="onLoad()">
 <h1>G-Wiz with Merc B Class modules - battery monitor</h1>
-<h2 id="commands">Set max charge level</h2>
-<p>For a full charge set this to 4.2V per cell. Note that charging regularly to this level shortens the life of the battery. So use a lower level if you do not need the full range.</p>
-<p><button onclick="sendCmd('VOLTLIMHI 4.2');">4.2V/cell</button>
+<h2 id="commands">Set maximum charge level</h2>
+<p>For a full charge set this to 4.14V per cell. Note that charging regularly to this level shortens the life of the battery. So use a lower level if you do not need the full range.</p>
+<p><button onclick="sendCmd('VOLTLIMHI 4.14');">4.14V/cell</button>
    <button onclick="sendCmd('VOLTLIMHI 4.1');">4.1V/cell</button>
    <button onclick="sendCmd('VOLTLIMHI 4.0');">4.0V/cell</button>
    <button onclick="sendCmd('VOLTLIMHI 3.9');">3.9V/cell</button></p>
@@ -39,6 +39,11 @@
 <h2 id="commands">Commands</h2>
 <p><button onclick="sendCmd('status');">Show Status</button> 
 <button onclick="sendCmd('settings');">Show Settings</button></p>
+<p><button onclick="sendCmd('AUTOBALON');">Start Autobalance</button>
+<button onclick="sendCmd('AUTOBALOFF');">Stop Autobalance</button>
+<button onclick="sendCmd('BAL 30');">Balance for 30s</button>
+<button onclick="sendCmd('BAL 60');">Balance for 1min</button></p>
+
 <p><input type="text" id="customcmd"/> <button onclick="sendCmd(document.getElementById('customcmd').value);">Send Custom Command</button></p>
 <p>Messages: <button onclick="clearMessages();">Clear</button></p>
 <pre><div id="message"></div></pre>
