@@ -8,7 +8,8 @@ class BMSModuleManager
 public:
     BMSModuleManager();
     //void balanceCells();
-    void balanceCells(float lowestCellVoltage, int duration, int debug);
+    bool balanceCells(float lowestCellVoltage, int duration, int debug);
+    void testBalanceResistor(int module, int cell);
     void stopBalancing();
     void setupBoards();
     void findBoards();
