@@ -30,17 +30,19 @@ BMSModuleManager::BMSModuleManager()
     it is passed the minimum cell voltage
 */
 
-void BMSModuleManager::balanceCells(float lowestCellVoltage, int duration, int debug)
+bool BMSModuleManager::balanceCells(float lowestCellVoltage, int duration, int debug)
 {
     uint8_t payload[4];
     uint8_t buff[30];
     uint8_t balance = 0; //bit 0 - 5 are to activate cell balancing 1-6
     //CellsBalancing = 0;
+    uint balanceCount = 0;
+
     if (debug == 1)
     {
         Serial.println();
         Serial.print("Lowest voltage - ");
-        Serial.print(lowestCellVoltage);
+        Serial.print(lowestCellVoltage, 3);
         Serial.println();
     }
     for (int y = 1; y < 63; y++)
@@ -51,12 +53,13 @@ void BMSModuleManager::balanceCells(float lowestCellVoltage, int duration, int d
             for (int i = 0; i < 6; i++)
             {
                 Serial.print("cell voltage - ");
-                Serial.print(modules[y].getCellVoltage(i));
+                Serial.print(modules[y].getCellVoltage(i), 3);
                 Serial.println();
 
                 if ((lowestCellVoltage + settings.balanceTollerance) < modules[y].getCellVoltage(i))
                 {
                     balance = balance | (1 << i);
+                    balanceCount++;
                 }
             }
             if (debug == 1)
@@ -68,6 +71,22 @@ void BMSModuleManager::balanceCells(float lowestCellVoltage, int duration, int d
             }
             if (balance != 0) //only send balance command when needed
             {
+                payload[0] = y << 1;
+                payload[1] = REG_BAL_CTRL;
+                payload[2] = 0; //writing zero to this register resets balance time and must be done before setting balance resistors again.
+                BMSUtil::sendData(payload, 3, true);
+                delay(2);
+                BMSUtil::getReply(buff, 30);
+                if (debug == 1)
+                {
+                    for (int z = 0; z < 4; z++)
+                    {
+                        Serial.print(buff[z], HEX);
+                        Serial.print("-");
+                    }
+                    Serial.print(" | ");
+                }
+
                 payload[0] = y << 1;
                 payload[1] = REG_BAL_TIME;
                 payload[2] = duration; // limits the duration of the balancing until it is retriggered
@@ -105,6 +124,14 @@ void BMSModuleManager::balanceCells(float lowestCellVoltage, int duration, int d
             }
         }
     }
+    if (balanceCount == 0)
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
 }
 
 void BMSModuleManager::stopBalancing()
@@ -115,6 +142,74 @@ void BMSModuleManager::stopBalancing()
         {
             modules[x].stopBalance();
         }
+    }
+}
+
+void BMSModuleManager::testBalanceResistor(int module, int cell)
+{
+    uint8_t payload[4];
+    uint8_t buff[30];
+    uint8_t balance = 0; //bit 0 - 5 are to activate cell balancing 1-6
+
+    if (1)//(modules[module].isExisting() == 1)
+    {
+        balance = 0;
+
+        Serial.print("cell voltage - ");
+        Serial.print(modules[module].getCellVoltage(cell), 3);
+        Serial.println();
+
+        balance = balance | (1 << cell);
+
+        Serial.print(module);
+        Serial.print(" - ");
+        Serial.print(balance, BIN);
+        Serial.print(" | ");
+
+        if (balance != 0) //only send balance command when needed
+        {
+            payload[0] = module << 1;
+            payload[1] = REG_BAL_CTRL;
+            payload[2] = 0; //writing zero to this register resets balance time and must be done before setting balance resistors again.
+            BMSUtil::sendData(payload, 3, true);
+            delay(2);
+            BMSUtil::getReply(buff, 30);
+
+            for (int z = 0; z < 4; z++)
+            {
+                Serial.print(buff[z], HEX);
+                Serial.print("-");
+            }
+            Serial.print(" | ");
+
+            payload[0] = module << 1;
+            payload[1] = REG_BAL_TIME;
+            payload[2] = 100; // limits the duration of the balancing  - 100 seconds for this testing
+            BMSUtil::sendData(payload, 3, true);
+            delay(2);
+            BMSUtil::getReply(buff, 30);
+
+            for (int z = 0; z < 4; z++)
+            {
+                Serial.print(buff[z], HEX);
+                Serial.print("-");
+            }
+            Serial.print(" | ");
+
+            payload[0] = module << 1;
+            payload[1] = REG_BAL_CTRL;
+            payload[2] = balance; //write balance state to register
+            BMSUtil::sendData(payload, 3, true);
+            delay(2);
+            BMSUtil::getReply(buff, 30);
+
+            for (int z = 0; z < 4; z++)
+            {
+                Serial.print(buff[z], HEX);
+                Serial.print("-");
+            }
+        }
+        Serial.println();
     }
 }
 

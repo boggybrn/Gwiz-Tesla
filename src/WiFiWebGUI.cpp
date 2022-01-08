@@ -6,6 +6,7 @@
 
 extern EEPROMSettings settings;
 extern BMSModuleManager bms;
+extern bool autoBalance;
 
 WiFiWebGUI::WiFiWebGUI(GwizPackInterface *pack, CurrentSensor *currentSensor, ChargeController *chargeControler)
 {
@@ -123,9 +124,10 @@ void WiFiWebGUI::handleWiFiCmd(void)
         reply += "Max cell limit " + String(settings.OverVSetpoint) + "V\n";
         reply += "Max charging temperature " + String(settings.OverTSetpoint) + "C\n";
         reply += "Min charging temperature " + String(settings.UnderTSetpoint) + "C\n";
-        reply += "Balance above Voltage " + String(settings.balanceVoltage) + "V\n";
-        reply += "Difference to trigger balancing " + String(settings.balanceHyst) + "V\n";
+        reply += "Balancing tollerance " + String(settings.balanceTollerance) + "V\n";
         reply += "Default full capacity " + String(settings.chargeInmASeconds / (3600*1000)) + "Ah";
+        if(autoBalance)
+            reply += "\nAutobalance in progress\n";
         SERIALWIFI.print(reply);
     }
     else if (cmdString == String("VOLTLIMHI"))
@@ -153,10 +155,27 @@ void WiFiWebGUI::handleWiFiCmd(void)
         int balanceTime = strtol((char *)(cmdBuffer + i), NULL, 0);
         if(balanceTime > 200)
             balanceTime = 200;
-        bms.balanceCells(myPack->getLowestCellVoltage(), balanceTime, 1);
         String reply = "";
-        reply += "\nBalancing for " + String(balanceTime) + " seconds\r\n";
+        
+        if(bms.balanceCells(myPack->getLowestCellVoltage(), balanceTime, 1))
+        {
+            reply += "\nBalancing for " + String(balanceTime) + " seconds\r\n";
+        }
+        else
+        {
+            reply += "\nNo balancing needed - cells within balancing tollerance\r\n";
+        }
         SERIALWIFI.print(reply);
+    }
+    else if (cmdString == String("AUTOBALON"))
+    {
+        autoBalance = true;
+        SERIALWIFI.print("Autobalance started\n");
+    }
+    else if (cmdString == String("AUTOBALOFF"))
+    {
+        autoBalance = false;
+        SERIALWIFI.print("Autobalance stopped\n");
     }
     else
     {

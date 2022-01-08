@@ -111,6 +111,7 @@ void SerialConsole::printMenu()
     Logger::console("   BALHYST=%f - How far voltage must dip before balancing is turned off", settings.balanceHyst);
     Logger::console("   BALTOL=%f - Tollerance from lowest cell to trigger balancing in another cell", settings.balanceTollerance);
     Logger::console("   CHARGE=%l - Charge in Battery in mA Seconds", settings.chargeInmASeconds);
+    Logger::console("  BALTEST=xy - Switch on balance resistor for module x, cell y");
 
     float OverVSetpoint;
     float UnderVSetpoint;
@@ -332,6 +333,13 @@ void SerialConsole::handleConfigCmd()
         settings.chargeInmASeconds = newValue;
         needEEPROMWrite = true;
         Logger::console("Charge in battery set to %l", settings.chargeInmASeconds);
+    }
+    else if (cmdString == String("BALTEST"))
+    {
+        int module = newValue / 10;
+        int cell = newValue % 10;
+        Logger::console("Balance resistor test module %d, cell %d", module, cell);
+        bms.testBalanceResistor(module, cell);
     }
     else
     {
